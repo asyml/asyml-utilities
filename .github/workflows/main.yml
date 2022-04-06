@@ -1,0 +1,48 @@
+name: Python Build
+
+on:
+  push:
+  pull_request:
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ 3.6, 3.7, 3.8, 3.9 ]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Cache pip
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('setup.py') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+            ${{ runner.os }}-
+      - name: Install dependencies
+        run: |
+          python -m pip install --progress-bar off --upgrade pip
+          pip install --progress-bar off pylint==2.10.2 flake8==3.9.2 mypy==0.931
+          pip install pytest
+          pip install --progress-bar off coverage codecov
+      - name: Linting pylint, flake8, and mypy
+        run: |
+          pylint asyml_utilities/
+          flake8 asyml_utilities/
+          mypy .
+      - name: Test with pytest and run coverage
+        run: |
+          pip install --progress-bar off .
+          coverage run -m pytest
+      - name: Upload to codecov
+        run: |
+          codecov
