@@ -5,7 +5,7 @@ long_description = (Path(__file__).parent / "README.md").read_text()
 
 setuptools.setup(
     name="asyml-utilities",
-    version="0.0.1.dev1",
+    version="0.0.2",
     url="https://github.com/asyml/asyml-utilities",
 
     description="Shared Utilities for ASYML Projects",
